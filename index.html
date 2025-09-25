@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en" data-color-scheme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyFlow - Productivity Timer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">StudyFlow</h1>
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="pomodoro">Pomodoro</button>
+                    <button class="mode-btn" data-mode="custom">Custom</button>
+                    <button class="mode-btn" data-mode="deepWork">Deep Work</button>
+                </div>
+                <div class="header-controls">
+                    <button class="btn btn--secondary btn--sm" id="statsBtn">📊 Stats</button>
+                    <button class="btn btn--secondary btn--sm" id="settingsBtn">⚙️ Settings</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Timer Section -->
+            <div class="timer-section">
+                <div class="timer-display">
+                    <div class="session-indicator">
+                        <span id="sessionType">Study Session</span>
+                        <span id="sessionCount">Session 1</span>
+                    </div>
+                    <div class="timer-circle">
+                        <svg class="timer-svg" width="280" height="280">
+                            <circle cx="140" cy="140" r="120" class="timer-track"></circle>
+                            <circle cx="140" cy="140" r="120" class="timer-progress" id="timerProgress"></circle>
+                        </svg>
+                        <div class="timer-text">
+                            <div class="timer-time" id="timerDisplay">25:00</div>
+                            <div class="timer-label" id="timerLabel">Ready to start</div>
+                        </div>
+                    </div>
+                    <div class="timer-controls">
+                        <button class="btn btn--primary btn--lg" id="startBtn">▶️ Start</button>
+                        <button class="btn btn--secondary" id="pauseBtn">⏸️ Pause</button>
+                        <button class="btn btn--outline" id="stopBtn">⏹️ Stop</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tasks Section -->
+            <div class="tasks-section">
+                <div class="tasks-header">
+                    <h2>Tasks</h2>
+                    <div class="task-stats">
+                        <span id="completedTasks">0</span>/<span id="totalTasks">0</span> completed
+                    </div>
+                </div>
+                <div class="task-input-container">
+                    <input type="text" class="form-control" id="taskInput" placeholder="Add a new task...">
+                    <button class="btn btn--primary" id="addTaskBtn">Add</button>
+                </div>
+                <div class="tasks-list" id="tasksList">
+                    <!-- Tasks will be dynamically added here -->
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Stats -->
+        <footer class="footer-stats">
+            <div class="stat-item">
+                <span class="stat-label">Today's Study Time</span>
+                <span class="stat-value" id="todayStudyTime">0h 0m</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Current Streak</span>
+                <span class="stat-value" id="currentStreak">0 days</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Tasks Completed</span>
+                <span class="stat-value" id="todayTasks">0</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Statistics Modal -->
+    <div class="modal hidden" id="statsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Statistics</h2>
+                <button class="modal-close" id="closeStatsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Study Time</h3>
+                        <p class="stat-number" id="totalStudyTime">0h 0m</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Sessions Completed</h3>
+                        <p class="stat-number" id="totalSessions">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Tasks Completed</h3>
+                        <p class="stat-number" id="totalTasksCompleted">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Best Streak</h3>
+                        <p class="stat-number" id="bestStreak">0 days</p>
+                    </div>
+                </div>
+                <div class="export-section">
+                    <button class="btn btn--primary" id="exportStatsBtn">📄 Export CSV</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal hidden" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="modal-close" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-group">
+                    <h3>Timer Settings</h3>
+                    <div class="settings-row">
+                        <label class="form-label">Custom Study Duration (minutes)</label>
+                        <input type="number" class="form-control" id="customStudyTime" min="1" max="180" value="60">
+                    </div>
+                    <div class="settings-row">
+                        <label class="form-label">Custom Break Duration (minutes)</label>
+                        <input type="number" class="form-control" id="customBreakTime" min="1" max="60" value="10">
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <h3>Preferences</h3>
+                    <div class="settings-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="soundEnabled" checked>
+                            Enable notification sounds
+                        </label>
+                    </div>
+                    <div class="settings-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="autoStartBreaks" checked>
+                            Auto-start break sessions
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <h3>Keyboard Shortcuts</h3>
+                    <div class="shortcuts-list">
+                        <div class="shortcut-item">
+                            <kbd>Space</kbd>
+                            <span>Start/Pause timer</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Esc</kbd>
+                            <span>Stop timer</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Enter</kbd>
+                            <span>Add new task</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>R</kbd>
+                            <span>Reset timer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Break Message Modal -->
+    <div class="modal hidden" id="breakModal">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <h2>Great Work! 🎉</h2>
+                <p class="break-message" id="breakMessage">Time for a well-deserved break.</p>
+                <div class="break-timer">
+                    <div class="break-time" id="breakTimeDisplay">5:00</div>
+                    <p>Break time remaining</p>
+                </div>
+                <button class="btn btn--primary" id="skipBreakBtn">Skip Break</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio element for notifications -->
+    <audio id="notificationSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmgyBjmBzvLZcyMFl" type="audio/wav">
+    </audio>
+
+    <script src="app.js"></script>
+</body>
+</html>
