@@ -772,10 +772,7 @@ body {
 .app-title {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
-  background: linear-gradient(135deg, var(--color-primary), var(--color-teal-400));
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
+  color: var(--color-primary);
   margin: 0;
 }
 
@@ -829,9 +826,16 @@ body {
 .timer-section {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   text-align: center;
+  gap: var(--space-32);
+}
+
+.timer-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .session-indicator {
@@ -904,6 +908,171 @@ body {
   display: flex;
   gap: var(--space-16);
   align-items: center;
+}
+
+/* Ambient Sound Section */
+.ambient-section {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-card-border);
+  padding: var(--space-24);
+  width: 100%;
+  max-width: 600px;
+}
+
+.ambient-section h3 {
+  margin: 0 0 var(--space-16) 0;
+  text-align: center;
+  color: var(--color-text);
+  font-size: var(--font-size-lg);
+}
+
+.sound-presets {
+  display: flex;
+  gap: var(--space-8);
+  margin-bottom: var(--space-24);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.preset-btn {
+  background-color: var(--color-bg-1);
+  color: var(--color-text);
+  border: 1px solid var(--color-card-border);
+}
+
+.preset-btn:hover {
+  background-color: var(--color-bg-2);
+}
+
+.preset-btn.active {
+  background-color: var(--color-primary);
+  color: var(--color-btn-primary-text);
+  border-color: var(--color-primary);
+}
+
+.sound-controls {
+  display: grid;
+  gap: var(--space-16);
+  margin-bottom: var(--space-24);
+}
+
+.sound-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-12);
+  padding: var(--space-12);
+  background-color: var(--color-bg-1);
+  border-radius: var(--radius-base);
+  border: 1px solid var(--color-card-border-inner);
+}
+
+.sound-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  background: none;
+  border: none;
+  color: var(--color-text);
+  cursor: pointer;
+  padding: var(--space-8);
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-standard);
+  min-width: 100px;
+}
+
+.sound-btn:hover {
+  background-color: var(--color-secondary);
+}
+
+.sound-btn.active {
+  background-color: var(--color-primary);
+  color: var(--color-btn-primary-text);
+}
+
+.sound-icon {
+  font-size: var(--font-size-lg);
+}
+
+.sound-label {
+  font-weight: var(--font-weight-medium);
+}
+
+.sound-status {
+  font-size: var(--font-size-xs);
+  opacity: 0.7;
+}
+
+.sound-status.playing::after {
+  content: "♪";
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.volume-control {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  flex: 1;
+}
+
+.volume-slider {
+  flex: 1;
+  height: 4px;
+  background: var(--color-secondary);
+  border-radius: var(--radius-full);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+  background: var(--color-primary-hover);
+  transform: scale(1.1);
+}
+
+.volume-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-standard);
+}
+
+.volume-slider::-moz-range-thumb:hover {
+  background: var(--color-primary-hover);
+  transform: scale(1.1);
+}
+
+.volume-value {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  min-width: 35px;
+  text-align: right;
+  font-family: var(--font-family-mono);
+}
+
+.master-volume {
+  text-align: center;
+  padding-top: var(--space-16);
+  border-top: 1px solid var(--color-card-border-inner);
+}
+
+.master-volume label {
+  display: block;
+  margin-bottom: var(--space-8);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
 }
 
 /* Tasks Section */
@@ -1128,6 +1297,30 @@ body {
   padding: var(--space-24);
 }
 
+/* Audio Modal Specific */
+.audio-permission {
+  text-align: center;
+  padding: var(--space-24);
+}
+
+.audio-permission h3 {
+  margin: 0 0 var(--space-16) 0;
+  color: var(--color-primary);
+}
+
+.audio-permission p {
+  margin: 0 0 var(--space-24) 0;
+  color: var(--color-text-secondary);
+}
+
+#audioVisualizer {
+  width: 100%;
+  height: 100px;
+  background-color: var(--color-bg-1);
+  border-radius: var(--radius-base);
+  border: 1px solid var(--color-card-border-inner);
+}
+
 /* Stats Modal */
 .stats-grid {
   display: grid;
@@ -1269,6 +1462,14 @@ kbd {
   .tasks-section {
     max-height: 50vh;
   }
+
+  .timer-section {
+    gap: var(--space-20);
+  }
+
+  .ambient-section {
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1299,11 +1500,27 @@ kbd {
     flex-direction: column;
     gap: var(--space-16);
   }
+
+  .sound-presets {
+    justify-content: center;
+  }
+
+  .sound-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-8);
+  }
+
+  .volume-control {
+    justify-content: center;
+  }
 }
 
 /* Focus states */
 .task-checkbox:focus,
-.mode-btn:focus {
+.mode-btn:focus,
+.sound-btn:focus,
+.volume-slider:focus {
   outline: var(--focus-outline);
   outline-offset: 2px;
 }
@@ -1325,4 +1542,14 @@ kbd {
 
 .tasks-list::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-primary);
+}
+
+/* Audio visualization effects */
+.sound-btn.active .sound-icon {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Text center utility */
+.text-center {
+  text-align: center;
 }

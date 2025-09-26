@@ -1,408 +1,279 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-color-scheme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyFlow Pro - Scientific Study Assistant</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #111111;
-            --bg-tertiary: #1a1a1a;
-            --accent-primary: #10b981;
-            --accent-secondary: #f59e0b;
-            --accent-danger: #ef4444;
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-muted: #64748b;
-            --border: #374151;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            overflow-x: hidden;
-        }
-
-        .gradient-border {
-            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
-            padding: 2px;
-            border-radius: 12px;
-        }
-
-        .gradient-border-content {
-            background: var(--bg-secondary);
-            border-radius: 10px;
-            padding: 1.5rem;
-        }
-
-        .timer-circle {
-            width: 280px;
-            height: 280px;
-            border-radius: 50%;
-            background: conic-gradient(var(--accent-primary) var(--progress, 0%), var(--bg-tertiary) 0%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .timer-inner {
-            width: 240px;
-            height: 240px;
-            border-radius: 50%;
-            background: var(--bg-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        .floating-panel {
-            background: rgba(17, 17, 17, 0.95);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-        }
-
-        .ideas-panel {
-            position: fixed;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 300px;
-            height: 400px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 50;
-        }
-
-        .ideas-panel.minimized {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-        }
-
-        .breathing-circle {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            border: 2px solid var(--accent-primary);
-            margin: 0 auto;
-            animation: breathe 4s ease-in-out infinite;
-        }
-
-        @keyframes breathe {
-            0%, 100% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.1); opacity: 1; }
-        }
-
-        .pulse {
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .focus-mode .distraction {
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-
-        .task-item {
-            transition: all 0.3s ease;
-            cursor: grab;
-        }
-
-        .task-item:hover {
-            background: var(--bg-tertiary);
-            transform: translateX(4px);
-        }
-
-        .task-item.dragging {
-            opacity: 0.5;
-            transform: rotate(5deg);
-        }
-
-        .achievement-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
-            padding: 16px 24px;
-            border-radius: 12px;
-            color: white;
-            font-weight: 600;
-            transform: translateX(400px);
-            transition: transform 0.5s ease;
-            z-index: 100;
-        }
-
-        .achievement-notification.show {
-            transform: translateX(0);
-        }
-
-        .stats-card {
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .stats-card:hover {
-            border-color: var(--accent-primary);
-            transform: translateY(-2px);
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: var(--bg-tertiary);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-
-        .ambient-sounds {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .sound-button {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .sound-button:hover, .sound-button.active {
-            background: var(--accent-primary);
-            color: white;
-            border-color: var(--accent-primary);
-        }
-
-        .zen-mode {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--bg-primary);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-
-        .zen-mode.active {
-            display: flex;
-        }
-
-        @media (max-width: 1200px) {
-            .ideas-panel {
-                position: relative;
-                right: auto;
-                top: auto;
-                transform: none;
-                width: 100%;
-                margin-top: 20px;
-            }
-        }
-    </style>
+    <title>StudyFlow Pro - Productivity Timer</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-gray-900 min-h-screen">
-    <!-- Achievement Notification -->
-    <div id="achievement-notification" class="achievement-notification">
-        <i class="fas fa-trophy mr-2"></i>
-        <span id="achievement-text"></span>
-    </div>
-
-    <!-- Main Container -->
-    <div id="main-container" class="container mx-auto px-4 py-8 max-w-7xl">
+<body>
+    <div class="app-container">
         <!-- Header -->
-        <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold mb-2 bg-gradient-to-r from-green-400 to-amber-400 bg-clip-text text-transparent">
-                StudyFlow Pro
-            </h1>
-            <p class="text-gray-400">Evidence-based productivity for focused learning</p>
-        </div>
+        <header class="header">
+            <div class="header-content">
+                <h1 class="app-title">StudyFlow Pro</h1>
+                <div class="mode-selector">
+                    <button class="mode-btn active" data-mode="pomodoro">Pomodoro</button>
+                    <button class="mode-btn" data-mode="custom">Custom</button>
+                    <button class="mode-btn" data-mode="deepWork">Deep Work</button>
+                </div>
+                <div class="header-controls">
+                    <button class="btn btn--secondary btn--sm" id="audioBtn">🎵 Audio</button>
+                    <button class="btn btn--secondary btn--sm" id="statsBtn">📊 Stats</button>
+                    <button class="btn btn--secondary btn--sm" id="settingsBtn">⚙️ Settings</button>
+                </div>
+            </div>
+        </header>
 
-        <!-- Top Controls -->
-        <div class="flex justify-center gap-4 mb-8 flex-wrap">
-            <!-- Focus Mode Toggle -->
-            <button id="focus-mode-btn" class="px-4 py-2 bg-gray-800 hover:bg-green-600 rounded-lg transition-all">
-                <i class="fas fa-eye mr-2"></i>Focus Mode
-            </button>
-            
-            <!-- Zen Mode -->
-            <button id="zen-mode-btn" class="px-4 py-2 bg-gray-800 hover:bg-amber-600 rounded-lg transition-all">
-                <i class="fas fa-leaf mr-2"></i>Zen Mode
-            </button>
-
-            <!-- Breathing Exercise -->
-            <button id="breathing-btn" class="px-4 py-2 bg-gray-800 hover:bg-blue-600 rounded-lg transition-all">
-                <i class="fas fa-wind mr-2"></i>Breathe
-            </button>
-
-            <!-- Stats Export -->
-            <button id="export-btn" class="px-4 py-2 bg-gray-800 hover:bg-purple-600 rounded-lg transition-all">
-                <i class="fas fa-download mr-2"></i>Export Data
-            </button>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Main Content -->
+        <main class="main-content">
             <!-- Timer Section -->
-            <div class="lg:col-span-2">
-                <div class="floating-panel p-8 text-center">
-                    <!-- Study Mode Selection -->
-                    <div class="mb-8 distraction">
-                        <div class="flex justify-center gap-2 flex-wrap">
-                            <button class="mode-btn px-4 py-2 rounded-lg bg-gray-800 hover:bg-green-600 transition-all" data-mode="pomodoro">
-                                🍅 Pomodoro
-                            </button>
-                            <button class="mode-btn px-4 py-2 rounded-lg bg-gray-800 hover:bg-green-600 transition-all" data-mode="custom">
-                                ⚙️ Custom
-                            </button>
-                            <button class="mode-btn px-4 py-2 rounded-lg bg-gray-800 hover:bg-green-600 transition-all" data-mode="deepwork">
-                                🧠 Deep Work
-                            </button>
+            <div class="timer-section">
+                <div class="timer-display">
+                    <div class="session-indicator">
+                        <span id="sessionType">Study Session</span>
+                        <span id="sessionCount">Session 1</span>
+                    </div>
+                    <div class="timer-circle">
+                        <svg class="timer-svg" width="280" height="280">
+                            <circle cx="140" cy="140" r="120" class="timer-track"></circle>
+                            <circle cx="140" cy="140" r="120" class="timer-progress" id="timerProgress"></circle>
+                        </svg>
+                        <div class="timer-text">
+                            <div class="timer-time" id="timerDisplay">25:00</div>
+                            <div class="timer-label" id="timerLabel">Ready to start</div>
                         </div>
                     </div>
-
-                    <!-- Timer Display -->
-                    <div class="timer-circle mx-auto mb-8" id="timer-circle">
-                        <div class="timer-inner">
-                            <div id="timer-display" class="text-5xl font-bold text-green-400 mb-2">25:00</div>
-                            <div id="session-info" class="text-sm text-gray-400">Study Session</div>
-                            <div id="session-counter" class="text-xs text-gray-500 mt-1">Session 1</div>
-                        </div>
+                    <div class="timer-controls">
+                        <button class="btn btn--primary btn--lg" id="startBtn">▶️ Start</button>
+                        <button class="btn btn--secondary" id="pauseBtn">⏸️ Pause</button>
+                        <button class="btn btn--outline" id="stopBtn">⏹️ Stop</button>
                     </div>
-
-                    <!-- Timer Controls -->
-                    <div class="flex justify-center gap-4 mb-6">
-                        <button id="start-btn" class="px-8 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition-all">
-                            <i class="fas fa-play mr-2"></i>Start
-                        </button>
-                        <button id="pause-btn" class="px-8 py-3 bg-amber-600 hover:bg-amber-700 rounded-lg font-semibold transition-all" style="display: none;">
-                            <i class="fas fa-pause mr-2"></i>Pause
-                        </button>
-                        <button id="stop-btn" class="px-6 py-3 bg-red-600 hover:bg-red-700 rounded-lg font-semibold transition-all">
-                            <i class="fas fa-stop mr-2"></i>Stop
-                        </button>
-                    </div>
-
-                    <!-- Custom Duration Settings -->
-                    <div id="custom-settings" class="grid grid-cols-2 gap-4 mb-6 distraction" style="display: none;">
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Study Duration (min)</label>
-                            <input type="number" id="study-duration" class="w-full px-3 py-2 bg-gray-800 rounded-lg" value="25" min="1" max="180">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Break Duration (min)</label>
-                            <input type="number" id="break-duration" class="w-full px-3 py-2 bg-gray-800 rounded-lg" value="5" min="1" max="60">
-                        </div>
-                    </div>
-
-                    <!-- Motivational Message -->
-                    <div id="motivation-message" class="text-center text-gray-400 italic"></div>
                 </div>
 
-                <!-- Statistics Dashboard -->
-                <div class="floating-panel p-6 mt-6 distraction">
-                    <h3 class="text-xl font-semibold mb-4 text-green-400">Today's Progress</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="stats-card">
-                            <div class="text-2xl font-bold text-green-400" id="study-time-today">0h 0m</div>
-                            <div class="text-sm text-gray-400">Study Time</div>
+                <!-- Ambient Sound Controls -->
+                <div class="ambient-section">
+                    <h3>Ambient Sounds</h3>
+                    <div class="sound-presets">
+                        <button class="btn btn--sm preset-btn" data-preset="0">Deep Focus</button>
+                        <button class="btn btn--sm preset-btn" data-preset="1">Nature Study</button>
+                        <button class="btn btn--sm preset-btn" data-preset="2">Café Vibes</button>
+                        <button class="btn btn--sm preset-btn" data-preset="3">Pure Rain</button>
+                    </div>
+                    <div class="sound-controls">
+                        <div class="sound-item">
+                            <button class="sound-btn" id="rainBtn" data-sound="rain">
+                                <span class="sound-icon">🌧️</span>
+                                <span class="sound-label">Rain</span>
+                                <span class="sound-status"></span>
+                            </button>
+                            <div class="volume-control">
+                                <input type="range" class="volume-slider" id="rainVolume" min="0" max="100" value="0">
+                                <span class="volume-value">0%</span>
+                            </div>
                         </div>
-                        <div class="stats-card">
-                            <div class="text-2xl font-bold text-amber-400" id="sessions-completed">0</div>
-                            <div class="text-sm text-gray-400">Sessions</div>
+                        <div class="sound-item">
+                            <button class="sound-btn" id="forestBtn" data-sound="forest">
+                                <span class="sound-icon">🌲</span>
+                                <span class="sound-label">Forest</span>
+                                <span class="sound-status"></span>
+                            </button>
+                            <div class="volume-control">
+                                <input type="range" class="volume-slider" id="forestVolume" min="0" max="100" value="0">
+                                <span class="volume-value">0%</span>
+                            </div>
                         </div>
-                        <div class="stats-card">
-                            <div class="text-2xl font-bold text-blue-400" id="tasks-completed">0</div>
-                            <div class="text-sm text-gray-400">Tasks Done</div>
+                        <div class="sound-item">
+                            <button class="sound-btn" id="cafeBtn" data-sound="cafe">
+                                <span class="sound-icon">☕</span>
+                                <span class="sound-label">Café</span>
+                                <span class="sound-status"></span>
+                            </button>
+                            <div class="volume-control">
+                                <input type="range" class="volume-slider" id="cafeVolume" min="0" max="100" value="0">
+                                <span class="volume-value">0%</span>
+                            </div>
                         </div>
-                        <div class="stats-card">
-                            <div class="text-2xl font-bold text-purple-400" id="study-streak">0</div>
-                            <div class="text-sm text-gray-400">Day Streak</div>
+                        <div class="sound-item">
+                            <button class="sound-btn" id="wavesBtn" data-sound="waves">
+                                <span class="sound-icon">🌊</span>
+                                <span class="sound-label">Ocean</span>
+                                <span class="sound-status"></span>
+                            </button>
+                            <div class="volume-control">
+                                <input type="range" class="volume-slider" id="wavesVolume" min="0" max="100" value="0">
+                                <span class="volume-value">0%</span>
+                            </div>
                         </div>
                     </div>
-
-                    <!-- Weekly Progress -->
-                    <div class="mt-6">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-sm font-medium">Weekly Goal Progress</span>
-                            <span class="text-sm text-gray-400" id="weekly-progress">0%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="weekly-progress-bar" style="width: 0%"></div>
+                    <div class="master-volume">
+                        <label>Master Volume</label>
+                        <div class="volume-control">
+                            <input type="range" class="volume-slider" id="masterVolume" min="0" max="100" value="50">
+                            <span class="volume-value">50%</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Tasks Section -->
-            <div class="distraction">
-                <div class="floating-panel p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-semibold text-green-400">Focus Tasks</h3>
-                        <button id="clear-completed-btn" class="text-sm text-gray-400 hover:text-red-400 transition-colors">
-                            <i class="fas fa-trash mr-1"></i>Clear Done
-                        </button>
+            <div class="tasks-section">
+                <div class="tasks-header">
+                    <h2>Tasks</h2>
+                    <div class="task-stats">
+                        <span id="completedTasks">0</span>/<span id="totalTasks">0</span> completed
                     </div>
+                </div>
+                <div class="task-input-container">
+                    <input type="text" class="form-control" id="taskInput" placeholder="Add a new task...">
+                    <button class="btn btn--primary" id="addTaskBtn">Add</button>
+                </div>
+                <div class="tasks-list" id="tasksList">
+                    <!-- Tasks will be dynamically added here -->
+                </div>
+            </div>
+        </main>
 
-                    <!-- Add Task -->
-                    <div class="flex gap-2 mb-4">
-                        <input type="text" id="task-input" placeholder="Add a focus task..." class="flex-1 px-3 py-2 bg-gray-800 rounded-lg border border-gray-700 focus:border-green-500 focus:outline-none">
-                        <button id="add-task-btn" class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors">
-                            <i class="fas fa-plus"></i>
-                        </button>
+        <!-- Footer Stats -->
+        <footer class="footer-stats">
+            <div class="stat-item">
+                <span class="stat-label">Today's Study Time</span>
+                <span class="stat-value" id="todayStudyTime">0h 0m</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Current Streak</span>
+                <span class="stat-value" id="currentStreak">0 days</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Tasks Completed</span>
+                <span class="stat-value" id="todayTasks">0</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Audio Modal -->
+    <div class="modal hidden" id="audioModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Audio Settings</h2>
+                <button class="modal-close" id="closeAudioModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="audio-permission" id="audioPermission">
+                    <h3>🎵 Enable Audio</h3>
+                    <p>Click below to enable ambient sounds and timer notifications.</p>
+                    <button class="btn btn--primary" id="enableAudioBtn">Enable Audio</button>
+                </div>
+                <div class="audio-controls hidden" id="audioControls">
+                    <div class="settings-group">
+                        <h3>Sound Quality</h3>
+                        <div class="settings-row">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="highQualityAudio" checked>
+                                High quality audio (more CPU usage)
+                            </label>
+                        </div>
                     </div>
-
-                    <!-- Tasks List -->
-                    <div id="tasks-list" class="space-y-2 max-h-96 overflow-y-auto">
-                        <!-- Tasks will be added here dynamically -->
+                    <div class="settings-group">
+                        <h3>Audio Visualization</h3>
+                        <canvas id="audioVisualizer" width="400" height="100"></canvas>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                    <!-- Task Stats -->
-                    <div class="mt-4 pt-4 border-t border-gray-700">
-                        <div class="flex justify-between text-sm">
-                            <span class="text-gray-400">Remaining: <span id="remaining-tasks">0</span></span>
-                            <span class="text-green-400">Completed: <span id="completed-tasks-count">0</span></span>
+    <!-- Statistics Modal -->
+    <div class="modal hidden" id="statsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Statistics</h2>
+                <button class="modal-close" id="closeStatsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Total Study Time</h3>
+                        <p class="stat-number" id="totalStudyTime">0h 0m</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Sessions Completed</h3>
+                        <p class="stat-number" id="totalSessions">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Tasks Completed</h3>
+                        <p class="stat-number" id="totalTasksCompleted">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Best Streak</h3>
+                        <p class="stat-number" id="bestStreak">0 days</p>
+                    </div>
+                </div>
+                <div class="export-section">
+                    <button class="btn btn--primary" id="exportStatsBtn">📄 Export CSV</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal hidden" id="settingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Settings</h2>
+                <button class="modal-close" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="settings-group">
+                    <h3>Timer Settings</h3>
+                    <div class="settings-row">
+                        <label class="form-label">Custom Study Duration (minutes)</label>
+                        <input type="number" class="form-control" id="customStudyTime" min="1" max="180" value="60">
+                    </div>
+                    <div class="settings-row">
+                        <label class="form-label">Custom Break Duration (minutes)</label>
+                        <input type="number" class="form-control" id="customBreakTime" min="1" max="60" value="10">
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <h3>Audio Preferences</h3>
+                    <div class="settings-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="soundEnabled" checked>
+                            Enable timer notification sounds
+                        </label>
+                    </div>
+                    <div class="settings-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="autoStartBreaks" checked>
+                            Auto-start break sessions
+                        </label>
+                    </div>
+                    <div class="settings-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="ambientDuringBreaks" checked>
+                            Continue ambient sounds during breaks
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-group">
+                    <h3>Keyboard Shortcuts</h3>
+                    <div class="shortcuts-list">
+                        <div class="shortcut-item">
+                            <kbd>Space</kbd>
+                            <span>Start/Pause timer</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Esc</kbd>
+                            <span>Stop timer</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>Enter</kbd>
+                            <span>Add new task</span>
+                        </div>
+                        <div class="shortcut-item">
+                            <kbd>M</kbd>
+                            <span>Mute/unmute audio</span>
                         </div>
                     </div>
                 </div>
@@ -410,713 +281,21 @@
         </div>
     </div>
 
-    <!-- Ideas Panel -->
-    <div id="ideas-panel" class="ideas-panel floating-panel">
-        <div id="ideas-header" class="p-4 border-b border-gray-700 cursor-pointer flex justify-between items-center">
-            <div class="flex items-center">
-                <i class="fas fa-lightbulb text-amber-400 mr-2"></i>
-                <span class="font-semibold">Quick Ideas</span>
-            </div>
-            <i id="ideas-toggle" class="fas fa-minus text-gray-400 hover:text-amber-400 transition-colors"></i>
-        </div>
-        <div id="ideas-content" class="p-4 h-full">
-            <textarea 
-                id="ideas-textarea" 
-                placeholder="Capture ideas that pop up while studying..."
-                class="w-full h-64 bg-gray-800 rounded-lg p-3 border border-gray-700 focus:border-amber-500 focus:outline-none resize-none text-sm"
-            ></textarea>
-            <div class="mt-3 flex justify-between items-center text-xs text-gray-500">
-                <span>Auto-saved</span>
-                <button id="clear-ideas-btn" class="text-red-400 hover:text-red-300">Clear All</button>
+    <!-- Break Message Modal -->
+    <div class="modal hidden" id="breakModal">
+        <div class="modal-content">
+            <div class="modal-body text-center">
+                <h2>Great Work! 🎉</h2>
+                <p class="break-message" id="breakMessage">Time for a well-deserved break.</p>
+                <div class="break-timer">
+                    <div class="break-time" id="breakTimeDisplay">5:00</div>
+                    <p>Break time remaining</p>
+                </div>
+                <button class="btn btn--primary" id="skipBreakBtn">Skip Break</button>
             </div>
         </div>
     </div>
 
-    <!-- Zen Mode -->
-    <div id="zen-mode" class="zen-mode">
-        <div class="timer-circle mx-auto mb-8">
-            <div class="timer-inner">
-                <div id="zen-timer-display" class="text-6xl font-bold text-green-400 mb-2">25:00</div>
-                <div class="text-sm text-gray-400">Deep Focus</div>
-            </div>
-        </div>
-        <button id="zen-exit-btn" class="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition-all">
-            <i class="fas fa-times mr-2"></i>Exit Zen Mode
-        </button>
-    </div>
-
-    <!-- Breathing Exercise Modal -->
-    <div id="breathing-modal" class="fixed inset-0 bg-black bg-opacity-80 hidden items-center justify-center z-50">
-        <div class="text-center">
-            <div class="breathing-circle mb-6"></div>
-            <h3 class="text-2xl font-semibold mb-2">Focus Your Mind</h3>
-            <p class="text-gray-400 mb-6">Breathe with the circle • 4s in, 4s hold, 4s out</p>
-            <button id="breathing-close-btn" class="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg">
-                I'm Ready to Focus
-            </button>
-        </div>
-    </div>
-
-    <!-- Ambient Sounds -->
-    <div class="ambient-sounds">
-        <button class="sound-button" data-sound="rain" title="Rain Sounds">
-            <i class="fas fa-cloud-rain"></i>
-        </button>
-        <button class="sound-button" data-sound="forest" title="Forest Sounds">
-            <i class="fas fa-tree"></i>
-        </button>
-        <button class="sound-button" data-sound="cafe" title="Café Ambience">
-            <i class="fas fa-coffee"></i>
-        </button>
-        <button class="sound-button" data-sound="waves" title="Ocean Waves">
-            <i class="fas fa-water"></i>
-        </button>
-    </div>
-
-    <!-- Audio Elements -->
-    <audio id="timer-sound" preload="auto">
-        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmEfCECLz/TLfycEJnzM7+SXQwkUXa/n7qpVEgdBm9/uv2AghTyKy/DVfrEoUw==">
-    </audio>
-
-    <script>
-        class StudyFlowPro {
-            constructor() {
-                this.timer = {
-                    minutes: 25,
-                    seconds: 0,
-                    isRunning: false,
-                    isPaused: false,
-                    mode: 'study',
-                    sessionCount: 0,
-                    studyMode: 'pomodoro'
-                };
-
-                this.modes = {
-                    pomodoro: { study: 25, shortBreak: 5, longBreak: 15 },
-                    custom: { study: 25, shortBreak: 5, longBreak: 15 },
-                    deepwork: { study: 90, shortBreak: 20, longBreak: 30 }
-                };
-
-                this.stats = this.loadStats();
-                this.tasks = this.loadTasks();
-                this.ideas = this.loadIdeas();
-                this.achievements = [];
-
-                this.focusMode = false;
-                this.zenMode = false;
-
-                this.motivationalMessages = [
-                    "Stay focused, you're building something great! 🌟",
-                    "Every minute of focus compounds into mastery 🚀",
-                    "Your future self will thank you for this dedication 💪",
-                    "Deep work creates deep results 🧠",
-                    "You're training your mind like an athlete trains their body 🏃‍♂️",
-                    "Focus is your superpower - use it wisely ⚡",
-                    "Small consistent efforts lead to big breakthroughs 📈",
-                    "You're not just studying, you're evolving 🦋"
-                ];
-
-                this.breakMessages = [
-                    "Great work! Your brain deserves this rest 🧘‍♂️",
-                    "Stretch your body, refresh your mind 🤸‍♀️",
-                    "Hydrate and recharge - you're doing amazing! 💧",
-                    "Take a deep breath, you've earned this break 🌬️",
-                    "Movement helps consolidate learning 🚶‍♂️",
-                    "Your focused effort is paying off! 🎯",
-                    "Rest is productive too - let your mind wander ☁️"
-                ];
-
-                this.init();
-            }
-
-            init() {
-                this.bindEvents();
-                this.renderTasks();
-                this.renderStats();
-                this.loadIdeasFromStorage();
-                this.showMotivationalMessage();
-                this.checkAchievements();
-                this.updateWeeklyProgress();
-
-                // Auto-save ideas
-                setInterval(() => this.saveIdeas(), 2000);
-                
-                // Update stats every minute
-                setInterval(() => this.renderStats(), 60000);
-            }
-
-            bindEvents() {
-                // Timer controls
-                document.getElementById('start-btn').addEventListener('click', () => this.startTimer());
-                document.getElementById('pause-btn').addEventListener('click', () => this.pauseTimer());
-                document.getElementById('stop-btn').addEventListener('click', () => this.stopTimer());
-
-                // Mode selection
-                document.querySelectorAll('.mode-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => this.setStudyMode(e.target.dataset.mode));
-                });
-
-                // Custom duration inputs
-                document.getElementById('study-duration').addEventListener('change', () => this.updateCustomDuration());
-                document.getElementById('break-duration').addEventListener('change', () => this.updateCustomDuration());
-
-                // Task management
-                document.getElementById('add-task-btn').addEventListener('click', () => this.addTask());
-                document.getElementById('task-input').addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.addTask();
-                });
-                document.getElementById('clear-completed-btn').addEventListener('click', () => this.clearCompletedTasks());
-
-                // Ideas panel
-                document.getElementById('ideas-header').addEventListener('click', () => this.toggleIdeasPanel());
-                document.getElementById('clear-ideas-btn').addEventListener('click', () => this.clearIdeas());
-
-                // Special modes
-                document.getElementById('focus-mode-btn').addEventListener('click', () => this.toggleFocusMode());
-                document.getElementById('zen-mode-btn').addEventListener('click', () => this.toggleZenMode());
-                document.getElementById('zen-exit-btn').addEventListener('click', () => this.toggleZenMode());
-
-                // Breathing exercise
-                document.getElementById('breathing-btn').addEventListener('click', () => this.showBreathingExercise());
-                document.getElementById('breathing-close-btn').addEventListener('click', () => this.hideBreathingExercise());
-
-                // Export
-                document.getElementById('export-btn').addEventListener('click', () => this.exportData());
-
-                // Ambient sounds
-                document.querySelectorAll('.sound-button').forEach(btn => {
-                    btn.addEventListener('click', (e) => this.toggleAmbientSound(e.currentTarget));
-                });
-
-                // Keyboard shortcuts
-                document.addEventListener('keydown', (e) => this.handleKeyboard(e));
-            }
-
-            handleKeyboard(e) {
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-                
-                switch(e.code) {
-                    case 'Space':
-                        e.preventDefault();
-                        this.timer.isRunning ? this.pauseTimer() : this.startTimer();
-                        break;
-                    case 'Escape':
-                        e.preventDefault();
-                        this.stopTimer();
-                        break;
-                    case 'KeyF':
-                        e.preventDefault();
-                        this.toggleFocusMode();
-                        break;
-                    case 'KeyZ':
-                        e.preventDefault();
-                        this.toggleZenMode();
-                        break;
-                    case 'KeyB':
-                        e.preventDefault();
-                        this.showBreathingExercise();
-                        break;
-                }
-            }
-
-            setStudyMode(mode) {
-                this.timer.studyMode = mode;
-                document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('bg-green-600'));
-                document.querySelector(`[data-mode="${mode}"]`).classList.add('bg-green-600');
-
-                if (mode === 'custom') {
-                    document.getElementById('custom-settings').style.display = 'grid';
-                } else {
-                    document.getElementById('custom-settings').style.display = 'none';
-                }
-
-                this.resetTimer();
-                this.saveTimer();
-            }
-
-            updateCustomDuration() {
-                const study = parseInt(document.getElementById('study-duration').value);
-                const shortBreak = parseInt(document.getElementById('break-duration').value);
-                
-                this.modes.custom = {
-                    study: study,
-                    shortBreak: shortBreak,
-                    longBreak: shortBreak * 3
-                };
-
-                if (this.timer.studyMode === 'custom') {
-                    this.resetTimer();
-                }
-            }
-
-            startTimer() {
-                if (!this.timer.isRunning) {
-                    this.timer.isRunning = true;
-                    this.timer.isPaused = false;
-                    
-                    document.getElementById('start-btn').style.display = 'none';
-                    document.getElementById('pause-btn').style.display = 'inline-block';
-                    
-                    this.timerInterval = setInterval(() => this.tick(), 1000);
-                    this.showMotivationalMessage();
-                    this.playSound();
-                }
-            }
-
-            pauseTimer() {
-                if (this.timer.isRunning) {
-                    this.timer.isRunning = false;
-                    this.timer.isPaused = true;
-                    
-                    document.getElementById('start-btn').style.display = 'inline-block';
-                    document.getElementById('pause-btn').style.display = 'none';
-                    
-                    clearInterval(this.timerInterval);
-                }
-            }
-
-            stopTimer() {
-                this.timer.isRunning = false;
-                this.timer.isPaused = false;
-                
-                document.getElementById('start-btn').style.display = 'inline-block';
-                document.getElementById('pause-btn').style.display = 'none';
-                
-                clearInterval(this.timerInterval);
-                this.resetTimer();
-            }
-
-            tick() {
-                if (this.timer.seconds === 0) {
-                    if (this.timer.minutes === 0) {
-                        this.completeSession();
-                        return;
-                    }
-                    this.timer.minutes--;
-                    this.timer.seconds = 59;
-                } else {
-                    this.timer.seconds--;
-                }
-
-                this.updateDisplay();
-                this.updateProgress();
-            }
-
-            completeSession() {
-                this.playSound();
-                this.timer.isRunning = false;
-                document.getElementById('start-btn').style.display = 'inline-block';
-                document.getElementById('pause-btn').style.display = 'none';
-                clearInterval(this.timerInterval);
-
-                if (this.timer.mode === 'study') {
-                    this.timer.sessionCount++;
-                    this.stats.sessionsCompleted++;
-                    this.stats.studyTimeToday += this.getCurrentSessionDuration();
-                    
-                    // Switch to break
-                    this.timer.mode = 'break';
-                    const isLongBreak = this.timer.sessionCount % 4 === 0;
-                    const breakDuration = isLongBreak ? 
-                        this.modes[this.timer.studyMode].longBreak : 
-                        this.modes[this.timer.studyMode].shortBreak;
-                    
-                    this.timer.minutes = breakDuration;
-                    this.timer.seconds = 0;
-                    
-                    this.showNotification(`Study session complete! Time for a ${isLongBreak ? 'long' : 'short'} break.`);
-                    this.showBreakMessage();
-                } else {
-                    // Switch back to study
-                    this.timer.mode = 'study';
-                    this.timer.minutes = this.modes[this.timer.studyMode].study;
-                    this.timer.seconds = 0;
-                    
-                    this.showNotification('Break time over! Ready for another focused session?');
-                    this.showMotivationalMessage();
-                }
-
-                this.updateDisplay();
-                this.updateProgress();
-                this.renderStats();
-                this.checkAchievements();
-                this.saveTimer();
-                this.saveStats();
-            }
-
-            getCurrentSessionDuration() {
-                return this.timer.mode === 'study' ? 
-                    this.modes[this.timer.studyMode].study : 
-                    this.modes[this.timer.studyMode].shortBreak;
-            }
-
-            resetTimer() {
-                this.timer.minutes = this.modes[this.timer.studyMode].study;
-                this.timer.seconds = 0;
-                this.timer.mode = 'study';
-                this.updateDisplay();
-                this.updateProgress();
-                this.saveTimer();
-            }
-
-            updateDisplay() {
-                const display = `${this.timer.minutes.toString().padStart(2, '0')}:${this.timer.seconds.toString().padStart(2, '0')}`;
-                document.getElementById('timer-display').textContent = display;
-                document.getElementById('zen-timer-display').textContent = display;
-                
-                const sessionInfo = this.timer.mode === 'study' ? 'Focus Session' : 'Break Time';
-                document.getElementById('session-info').textContent = sessionInfo;
-                document.getElementById('session-counter').textContent = `Session ${this.timer.sessionCount + 1}`;
-
-                // Update document title
-                document.title = `${display} - ${sessionInfo} | StudyFlow Pro`;
-            }
-
-            updateProgress() {
-                const totalMinutes = this.modes[this.timer.studyMode][this.timer.mode === 'study' ? 'study' : 'shortBreak'];
-                const currentMinutes = this.timer.minutes + (this.timer.seconds / 60);
-                const progress = ((totalMinutes - currentMinutes) / totalMinutes) * 100;
-                
-                document.documentElement.style.setProperty('--progress', `${progress}%`);
-            }
-
-            showMotivationalMessage() {
-                const message = this.motivationalMessages[Math.floor(Math.random() * this.motivationalMessages.length)];
-                document.getElementById('motivation-message').textContent = message;
-            }
-
-            showBreakMessage() {
-                const message = this.breakMessages[Math.floor(Math.random() * this.breakMessages.length)];
-                document.getElementById('motivation-message').textContent = message;
-            }
-
-            // Task Management
-            addTask() {
-                const input = document.getElementById('task-input');
-                const text = input.value.trim();
-                
-                if (text) {
-                    const task = {
-                        id: Date.now(),
-                        text: text,
-                        completed: false,
-                        createdAt: new Date().toISOString()
-                    };
-                    
-                    this.tasks.unshift(task);
-                    this.saveTasks();
-                    this.renderTasks();
-                    input.value = '';
-                }
-            }
-
-            toggleTask(id) {
-                const task = this.tasks.find(t => t.id === id);
-                if (task) {
-                    task.completed = !task.completed;
-                    if (task.completed) {
-                        this.stats.tasksCompleted++;
-                        this.showAchievement('Task completed! 🎯');
-                    } else {
-                        this.stats.tasksCompleted = Math.max(0, this.stats.tasksCompleted - 1);
-                    }
-                    this.saveTasks();
-                    this.saveStats();
-                    this.renderTasks();
-                    this.renderStats();
-                }
-            }
-
-            deleteTask(id) {
-                this.tasks = this.tasks.filter(t => t.id !== id);
-                this.saveTasks();
-                this.renderTasks();
-            }
-
-            clearCompletedTasks() {
-                this.tasks = this.tasks.filter(t => !t.completed);
-                this.saveTasks();
-                this.renderTasks();
-            }
-
-            renderTasks() {
-                const container = document.getElementById('tasks-list');
-                container.innerHTML = '';
-
-                this.tasks.forEach((task, index) => {
-                    const taskElement = document.createElement('div');
-                    taskElement.className = `task-item p-3 rounded-lg border border-gray-700 flex items-center gap-3 ${task.completed ? 'opacity-60' : ''}`;
-                    taskElement.draggable = true;
-                    taskElement.dataset.taskId = task.id;
-                    
-                    taskElement.innerHTML = `
-                        <input type="checkbox" ${task.completed ? 'checked' : ''} 
-                               class="text-green-500" 
-                               onchange="app.toggleTask(${task.id})">
-                        <span class="flex-1 ${task.completed ? 'line-through text-gray-500' : ''}">${task.text}</span>
-                        <button onclick="app.deleteTask(${task.id})" 
-                                class="text-red-400 hover:text-red-300 text-sm">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    `;
-
-                    // Drag and drop
-                    taskElement.addEventListener('dragstart', (e) => {
-                        taskElement.classList.add('dragging');
-                        e.dataTransfer.setData('text/plain', task.id);
-                    });
-
-                    taskElement.addEventListener('dragend', () => {
-                        taskElement.classList.remove('dragging');
-                    });
-
-                    container.appendChild(taskElement);
-                });
-
-                // Update task counts
-                const remaining = this.tasks.filter(t => !t.completed).length;
-                const completed = this.tasks.filter(t => t.completed).length;
-                
-                document.getElementById('remaining-tasks').textContent = remaining;
-                document.getElementById('completed-tasks-count').textContent = completed;
-
-                // Enable drop zone
-                container.addEventListener('dragover', (e) => e.preventDefault());
-                container.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    // Handle reordering logic here
-                });
-            }
-
-            // Ideas Management
-            toggleIdeasPanel() {
-                const panel = document.getElementById('ideas-panel');
-                const content = document.getElementById('ideas-content');
-                const toggle = document.getElementById('ideas-toggle');
-                
-                panel.classList.toggle('minimized');
-                
-                if (panel.classList.contains('minimized')) {
-                    content.style.display = 'none';
-                    toggle.className = 'fas fa-plus text-gray-400 hover:text-amber-400 transition-colors';
-                } else {
-                    content.style.display = 'block';
-                    toggle.className = 'fas fa-minus text-gray-400 hover:text-amber-400 transition-colors';
-                }
-            }
-
-            saveIdeas() {
-                const textarea = document.getElementById('ideas-textarea');
-                this.ideas = textarea.value;
-                localStorage.setItem('studyflow-ideas', this.ideas);
-            }
-
-            loadIdeasFromStorage() {
-                document.getElementById('ideas-textarea').value = this.ideas;
-            }
-
-            clearIdeas() {
-                if (confirm('Clear all ideas? This cannot be undone.')) {
-                    document.getElementById('ideas-textarea').value = '';
-                    this.saveIdeas();
-                }
-            }
-
-            // Focus and Zen Modes
-            toggleFocusMode() {
-                this.focusMode = !this.focusMode;
-                const container = document.getElementById('main-container');
-                const btn = document.getElementById('focus-mode-btn');
-                
-                if (this.focusMode) {
-                    container.classList.add('focus-mode');
-                    btn.classList.add('bg-green-600');
-                    btn.innerHTML = '<i class="fas fa-eye-slash mr-2"></i>Exit Focus';
-                } else {
-                    container.classList.remove('focus-mode');
-                    btn.classList.remove('bg-green-600');
-                    btn.innerHTML = '<i class="fas fa-eye mr-2"></i>Focus Mode';
-                }
-            }
-
-            toggleZenMode() {
-                this.zenMode = !this.zenMode;
-                const zenDiv = document.getElementById('zen-mode');
-                const btn = document.getElementById('zen-mode-btn');
-                
-                if (this.zenMode) {
-                    zenDiv.classList.add('active');
-                    btn.classList.add('bg-amber-600');
-                } else {
-                    zenDiv.classList.remove('active');
-                    btn.classList.remove('bg-amber-600');
-                }
-            }
-
-            // Breathing Exercise
-            showBreathingExercise() {
-                document.getElementById('breathing-modal').classList.remove('hidden');
-                document.getElementById('breathing-modal').classList.add('flex');
-            }
-
-            hideBreathingExercise() {
-                document.getElementById('breathing-modal').classList.add('hidden');
-                document.getElementById('breathing-modal').classList.remove('flex');
-            }
-
-            // Statistics and Achievements
-            renderStats() {
-                const hours = Math.floor(this.stats.studyTimeToday / 60);
-                const minutes = this.stats.studyTimeToday % 60;
-                
-                document.getElementById('study-time-today').textContent = `${hours}h ${minutes}m`;
-                document.getElementById('sessions-completed').textContent = this.stats.sessionsCompleted;
-                document.getElementById('tasks-completed').textContent = this.stats.tasksCompleted;
-                document.getElementById('study-streak').textContent = this.stats.streak;
-            }
-
-            updateWeeklyProgress() {
-                const weeklyGoal = 1200; // 20 hours per week
-                const progress = Math.min((this.stats.weeklyStudyTime / weeklyGoal) * 100, 100);
-                
-                document.getElementById('weekly-progress').textContent = `${Math.round(progress)}%`;
-                document.getElementById('weekly-progress-bar').style.width = `${progress}%`;
-            }
-
-            checkAchievements() {
-                const achievements = [
-                    { condition: this.stats.sessionsCompleted >= 1, message: 'First session complete! 🎉' },
-                    { condition: this.stats.sessionsCompleted >= 5, message: '5 sessions milestone! 🔥' },
-                    { condition: this.stats.studyTimeToday >= 60, message: '1 hour of focused study! 💪' },
-                    { condition: this.stats.studyTimeToday >= 180, message: '3 hours of deep work! 🧠' },
-                    { condition: this.stats.tasksCompleted >= 5, message: 'Task completion master! ✅' },
-                    { condition: this.stats.streak >= 3, message: '3 day study streak! 🔥' },
-                ];
-
-                achievements.forEach(achievement => {
-                    if (achievement.condition && !this.achievements.includes(achievement.message)) {
-                        this.showAchievement(achievement.message);
-                        this.achievements.push(achievement.message);
-                    }
-                });
-            }
-
-            showAchievement(message) {
-                const notification = document.getElementById('achievement-notification');
-                const text = document.getElementById('achievement-text');
-                
-                text.textContent = message;
-                notification.classList.add('show');
-                
-                setTimeout(() => {
-                    notification.classList.remove('show');
-                }, 4000);
-            }
-
-            showNotification(message) {
-                if ('Notification' in window && Notification.permission === 'granted') {
-                    new Notification('StudyFlow Pro', { body: message, icon: '/favicon.ico' });
-                }
-            }
-
-            // Ambient Sounds
-            toggleAmbientSound(button) {
-                const sound = button.dataset.sound;
-                
-                // Remove active class from all buttons
-                document.querySelectorAll('.sound-button').forEach(btn => btn.classList.remove('active'));
-                
-                // Add active class to clicked button
-                button.classList.add('active');
-                
-                // Here you would implement actual sound playback
-                console.log(`Playing ${sound} ambient sound`);
-            }
-
-            playSound() {
-                document.getElementById('timer-sound').play().catch(e => console.log('Sound play failed:', e));
-            }
-
-            // Data Management
-            exportData() {
-                const data = {
-                    stats: this.stats,
-                    tasks: this.tasks,
-                    ideas: this.ideas,
-                    timer: this.timer,
-                    exportDate: new Date().toISOString()
-                };
-
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `studyflow-data-${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                this.showAchievement('Data exported successfully! 📊');
-            }
-
-            // Storage Methods
-            saveTimer() {
-                localStorage.setItem('studyflow-timer', JSON.stringify(this.timer));
-            }
-
-            loadTimer() {
-                const saved = localStorage.getItem('studyflow-timer');
-                return saved ? JSON.parse(saved) : this.timer;
-            }
-
-            saveTasks() {
-                localStorage.setItem('studyflow-tasks', JSON.stringify(this.tasks));
-            }
-
-            loadTasks() {
-                const saved = localStorage.getItem('studyflow-tasks');
-                return saved ? JSON.parse(saved) : [];
-            }
-
-            saveStats() {
-                localStorage.setItem('studyflow-stats', JSON.stringify(this.stats));
-            }
-
-            loadStats() {
-                const saved = localStorage.getItem('studyflow-stats');
-                const defaultStats = {
-                    studyTimeToday: 0,
-                    weeklyStudyTime: 0,
-                    sessionsCompleted: 0,
-                    tasksCompleted: 0,
-                    streak: 0,
-                    lastStudyDate: null
-                };
-                return saved ? { ...defaultStats, ...JSON.parse(saved) } : defaultStats;
-            }
-
-            loadIdeas() {
-                return localStorage.getItem('studyflow-ideas') || '';
-            }
-        }
-
-        // Initialize the application
-        const app = new StudyFlowPro();
-
-        // Request notification permission
-        if ('Notification' in window && Notification.permission !== 'granted') {
-            Notification.requestPermission();
-        }
-
-        // Prevent accidental page reload
-        window.addEventListener('beforeunload', (e) => {
-            if (app.timer.isRunning) {
-                e.preventDefault();
-                e.returnValue = 'You have an active timer. Are you sure you want to leave?';
-            }
-        });
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>
