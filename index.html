@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyFlow Pro - Productivity Timer</title>
+    <title>StudyFlow - Focus & Productivity Timer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,14 +11,22 @@
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <h1 class="app-title">StudyFlow Pro</h1>
+                <div class="header-left">
+                    <h1 class="app-title">StudyFlow</h1>
+                    <div class="focus-score">
+                        <span class="focus-label">Focus Score:</span>
+                        <span class="focus-value" id="focusScore">0</span>
+                    </div>
+                </div>
                 <div class="mode-selector">
-                    <button class="mode-btn active" data-mode="pomodoro">Pomodoro</button>
-                    <button class="mode-btn" data-mode="custom">Custom</button>
-                    <button class="mode-btn" data-mode="deepWork">Deep Work</button>
+                    <button class="mode-btn active" data-mode="pomodoro" title="Classic 25-minute focus blocks">Pomodoro</button>
+                    <button class="mode-btn" data-mode="deepWork" title="Extended 90-minute deep focus sessions">Deep Work</button>
+                    <button class="mode-btn" data-mode="ultradian" title="Natural 120-minute attention cycles">Ultradian</button>
+                    <button class="mode-btn" data-mode="flowState" title="Extended flow state sessions">Flow State</button>
+                    <button class="mode-btn" data-mode="custom" title="Customizable session lengths">Custom</button>
                 </div>
                 <div class="header-controls">
-                    <button class="btn btn--secondary btn--sm" id="audioBtn">🎵 Audio</button>
+                    <button class="btn btn--secondary btn--sm" id="ideasToggle">💡 Ideas</button>
                     <button class="btn btn--secondary btn--sm" id="statsBtn">📊 Stats</button>
                     <button class="btn btn--secondary btn--sm" id="settingsBtn">⚙️ Settings</button>
                 </div>
@@ -50,68 +58,22 @@
                         <button class="btn btn--outline" id="stopBtn">⏹️ Stop</button>
                     </div>
                 </div>
-
-                <!-- Ambient Sound Controls -->
-                <div class="ambient-section">
-                    <h3>Ambient Sounds</h3>
-                    <div class="sound-presets">
-                        <button class="btn btn--sm preset-btn" data-preset="0">Deep Focus</button>
-                        <button class="btn btn--sm preset-btn" data-preset="1">Nature Study</button>
-                        <button class="btn btn--sm preset-btn" data-preset="2">Café Vibes</button>
-                        <button class="btn btn--sm preset-btn" data-preset="3">Pure Rain</button>
+                
+                <!-- Sound Controls -->
+                <div class="sound-controls">
+                    <div class="sound-selector">
+                        <label class="form-label">Focus Sound</label>
+                        <select class="form-control" id="focusSound">
+                            <option value="">Silence</option>
+                            <option value="brown-noise">Brown Noise</option>
+                            <option value="forest">Forest Ambience</option>
+                            <option value="rain">Rain Sounds</option>
+                            <option value="ocean">Ocean Waves</option>
+                        </select>
                     </div>
-                    <div class="sound-controls">
-                        <div class="sound-item">
-                            <button class="sound-btn" id="rainBtn" data-sound="rain">
-                                <span class="sound-icon">🌧️</span>
-                                <span class="sound-label">Rain</span>
-                                <span class="sound-status"></span>
-                            </button>
-                            <div class="volume-control">
-                                <input type="range" class="volume-slider" id="rainVolume" min="0" max="100" value="0">
-                                <span class="volume-value">0%</span>
-                            </div>
-                        </div>
-                        <div class="sound-item">
-                            <button class="sound-btn" id="forestBtn" data-sound="forest">
-                                <span class="sound-icon">🌲</span>
-                                <span class="sound-label">Forest</span>
-                                <span class="sound-status"></span>
-                            </button>
-                            <div class="volume-control">
-                                <input type="range" class="volume-slider" id="forestVolume" min="0" max="100" value="0">
-                                <span class="volume-value">0%</span>
-                            </div>
-                        </div>
-                        <div class="sound-item">
-                            <button class="sound-btn" id="cafeBtn" data-sound="cafe">
-                                <span class="sound-icon">☕</span>
-                                <span class="sound-label">Café</span>
-                                <span class="sound-status"></span>
-                            </button>
-                            <div class="volume-control">
-                                <input type="range" class="volume-slider" id="cafeVolume" min="0" max="100" value="0">
-                                <span class="volume-value">0%</span>
-                            </div>
-                        </div>
-                        <div class="sound-item">
-                            <button class="sound-btn" id="wavesBtn" data-sound="waves">
-                                <span class="sound-icon">🌊</span>
-                                <span class="sound-label">Ocean</span>
-                                <span class="sound-status"></span>
-                            </button>
-                            <div class="volume-control">
-                                <input type="range" class="volume-slider" id="wavesVolume" min="0" max="100" value="0">
-                                <span class="volume-value">0%</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="master-volume">
-                        <label>Master Volume</label>
-                        <div class="volume-control">
-                            <input type="range" class="volume-slider" id="masterVolume" min="0" max="100" value="50">
-                            <span class="volume-value">50%</span>
-                        </div>
+                    <div class="volume-control">
+                        <label class="form-label">Volume</label>
+                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
                     </div>
                 </div>
             </div>
@@ -131,8 +93,48 @@
                 <div class="tasks-list" id="tasksList">
                     <!-- Tasks will be dynamically added here -->
                 </div>
+                
+                <!-- Achievement Banner -->
+                <div class="achievement-banner hidden" id="achievementBanner">
+                    <div class="achievement-content">
+                        <span class="achievement-icon">🏆</span>
+                        <div class="achievement-text">
+                            <div class="achievement-title" id="achievementTitle">Achievement Unlocked!</div>
+                            <div class="achievement-desc" id="achievementDesc">You've earned a new badge!</div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </main>
+
+        <!-- Ideas Panel -->
+        <div class="ideas-panel hidden" id="ideasPanel">
+            <div class="ideas-header">
+                <h3>💡 Quick Ideas</h3>
+                <button class="ideas-close" id="ideasClose">×</button>
+            </div>
+            <div class="ideas-content">
+                <div class="idea-input-container">
+                    <textarea class="form-control" id="ideaInput" placeholder="Capture your idea quickly..." rows="2"></textarea>
+                    <div class="idea-controls">
+                        <select class="form-control idea-category" id="ideaCategory">
+                            <option value="general">General</option>
+                            <option value="study">Study</option>
+                            <option value="task">Task</option>
+                            <option value="insight">Insight</option>
+                            <option value="question">Question</option>
+                        </select>
+                        <button class="btn btn--primary btn--sm" id="addIdeaBtn">Save</button>
+                    </div>
+                </div>
+                <div class="ideas-list" id="ideasList">
+                    <!-- Ideas will be dynamically added here -->
+                </div>
+                <div class="ideas-footer">
+                    <button class="btn btn--outline btn--sm" id="exportIdeasBtn">📄 Export Ideas</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Footer Stats -->
         <footer class="footer-stats">
@@ -148,46 +150,18 @@
                 <span class="stat-label">Tasks Completed</span>
                 <span class="stat-value" id="todayTasks">0</span>
             </div>
+            <div class="stat-item">
+                <span class="stat-label">Ideas Captured</span>
+                <span class="stat-value" id="todayIdeas">0</span>
+            </div>
         </footer>
-    </div>
-
-    <!-- Audio Modal -->
-    <div class="modal hidden" id="audioModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Audio Settings</h2>
-                <button class="modal-close" id="closeAudioModal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="audio-permission" id="audioPermission">
-                    <h3>🎵 Enable Audio</h3>
-                    <p>Click below to enable ambient sounds and timer notifications.</p>
-                    <button class="btn btn--primary" id="enableAudioBtn">Enable Audio</button>
-                </div>
-                <div class="audio-controls hidden" id="audioControls">
-                    <div class="settings-group">
-                        <h3>Sound Quality</h3>
-                        <div class="settings-row">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="highQualityAudio" checked>
-                                High quality audio (more CPU usage)
-                            </label>
-                        </div>
-                    </div>
-                    <div class="settings-group">
-                        <h3>Audio Visualization</h3>
-                        <canvas id="audioVisualizer" width="400" height="100"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Statistics Modal -->
     <div class="modal hidden" id="statsModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Statistics</h2>
+                <h2>Statistics & Achievements</h2>
                 <button class="modal-close" id="closeStatsModal">&times;</button>
             </div>
             <div class="modal-body">
@@ -209,6 +183,14 @@
                         <p class="stat-number" id="bestStreak">0 days</p>
                     </div>
                 </div>
+                
+                <div class="achievements-section">
+                    <h3>Achievements</h3>
+                    <div class="achievements-grid" id="achievementsGrid">
+                        <!-- Achievements will be rendered here -->
+                    </div>
+                </div>
+                
                 <div class="export-section">
                     <button class="btn btn--primary" id="exportStatsBtn">📄 Export CSV</button>
                 </div>
@@ -235,12 +217,35 @@
                         <input type="number" class="form-control" id="customBreakTime" min="1" max="60" value="10">
                     </div>
                 </div>
+                
                 <div class="settings-group">
-                    <h3>Audio Preferences</h3>
+                    <h3>Wellness & Focus</h3>
+                    <div class="settings-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="eyeReminders" checked>
+                            Eye strain reminders (20-20-20 rule)
+                        </label>
+                    </div>
+                    <div class="settings-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="postureReminders" checked>
+                            Posture check reminders
+                        </label>
+                    </div>
+                    <div class="settings-row">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="hydrationReminders" checked>
+                            Hydration reminders
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-group">
+                    <h3>Preferences</h3>
                     <div class="settings-row">
                         <label class="checkbox-label">
                             <input type="checkbox" id="soundEnabled" checked>
-                            Enable timer notification sounds
+                            Enable notification sounds
                         </label>
                     </div>
                     <div class="settings-row">
@@ -251,11 +256,12 @@
                     </div>
                     <div class="settings-row">
                         <label class="checkbox-label">
-                            <input type="checkbox" id="ambientDuringBreaks" checked>
-                            Continue ambient sounds during breaks
+                            <input type="checkbox" id="distractionFreeMode">
+                            Distraction-free mode during focus
                         </label>
                     </div>
                 </div>
+                
                 <div class="settings-group">
                     <h3>Keyboard Shortcuts</h3>
                     <div class="shortcuts-list">
@@ -268,12 +274,12 @@
                             <span>Stop timer</span>
                         </div>
                         <div class="shortcut-item">
-                            <kbd>Enter</kbd>
-                            <span>Add new task</span>
+                            <kbd>I</kbd>
+                            <span>Toggle ideas panel</span>
                         </div>
                         <div class="shortcut-item">
-                            <kbd>M</kbd>
-                            <span>Mute/unmute audio</span>
+                            <kbd>T</kbd>
+                            <span>Focus task input</span>
                         </div>
                     </div>
                 </div>
@@ -281,20 +287,42 @@
         </div>
     </div>
 
-    <!-- Break Message Modal -->
+    <!-- Break Activities Modal -->
     <div class="modal hidden" id="breakModal">
         <div class="modal-content">
             <div class="modal-body text-center">
-                <h2>Great Work! 🎉</h2>
+                <h2>🎉 Great Work!</h2>
                 <p class="break-message" id="breakMessage">Time for a well-deserved break.</p>
                 <div class="break-timer">
                     <div class="break-time" id="breakTimeDisplay">5:00</div>
                     <p>Break time remaining</p>
                 </div>
-                <button class="btn btn--primary" id="skipBreakBtn">Skip Break</button>
+                
+                <div class="break-activities">
+                    <h3>Suggested Break Activity:</h3>
+                    <div class="break-activity" id="breakActivity">
+                        <div class="activity-title" id="activityTitle">Take a Deep Breath</div>
+                        <div class="activity-desc" id="activityDesc">Practice 4-7-8 breathing technique</div>
+                        <div class="activity-duration" id="activityDuration">60 seconds</div>
+                    </div>
+                </div>
+                
+                <div class="break-controls">
+                    <button class="btn btn--outline" id="skipBreakBtn">Skip Break</button>
+                    <button class="btn btn--primary" id="nextActivityBtn">Next Activity</button>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Audio Elements -->
+    <audio id="notificationSound" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmgyBjmBzvLZcyMFl" type="audio/wav">
+    </audio>
+    
+    <audio id="focusAudio" loop>
+        <source id="focusAudioSource" src="" type="audio/mpeg">
+    </audio>
 
     <script src="app.js"></script>
 </body>
