@@ -3,30 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyFlow - Focus & Productivity Timer</title>
+    <title>StudyFlow - Productivity Timer</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK v9+ -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 </head>
 <body>
-    <div class="app-container">
+    <!-- Loading Spinner -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <p>Loading StudyFlow...</p>
+    </div>
+
+    <!-- Authentication Screen -->
+    <div class="auth-container hidden" id="authContainer">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h1 class="auth-title">StudyFlow</h1>
+                <p class="auth-subtitle">Your productivity companion</p>
+            </div>
+            
+            <!-- Sign In Form -->
+            <div class="auth-form" id="signInForm">
+                <h2>Welcome Back</h2>
+                <form id="signInFormElement">
+                    <div class="form-group">
+                        <label class="form-label" for="signInEmail">Email</label>
+                        <input type="email" class="form-control" id="signInEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signInPassword">Password</label>
+                        <input type="password" class="form-control" id="signInPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Sign In</button>
+                </form>
+                
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+                
+                <button class="btn btn--outline btn--full-width" id="googleSignInBtn">
+                    🔍 Continue with Google
+                </button>
+                
+                <div class="auth-actions">
+                    <button class="auth-link" id="showSignUpBtn">Don't have an account? Sign up</button>
+                    <button class="auth-link" id="showForgotPasswordBtn">Forgot password?</button>
+                </div>
+            </div>
+            
+            <!-- Sign Up Form -->
+            <div class="auth-form hidden" id="signUpForm">
+                <h2>Create Account</h2>
+                <form id="signUpFormElement">
+                    <div class="form-group">
+                        <label class="form-label" for="signUpName">Display Name</label>
+                        <input type="text" class="form-control" id="signUpName" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signUpEmail">Email</label>
+                        <input type="email" class="form-control" id="signUpEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="signUpPassword">Password</label>
+                        <input type="password" class="form-control" id="signUpPassword" required minlength="6">
+                        <small class="form-help">At least 6 characters</small>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Create Account</button>
+                </form>
+                
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+                
+                <button class="btn btn--outline btn--full-width" id="googleSignUpBtn">
+                    🔍 Continue with Google
+                </button>
+                
+                <div class="auth-actions">
+                    <button class="auth-link" id="showSignInBtn">Already have an account? Sign in</button>
+                </div>
+            </div>
+            
+            <!-- Forgot Password Form -->
+            <div class="auth-form hidden" id="forgotPasswordForm">
+                <h2>Reset Password</h2>
+                <p class="auth-description">Enter your email address and we'll send you a link to reset your password.</p>
+                <form id="forgotPasswordFormElement">
+                    <div class="form-group">
+                        <label class="form-label" for="forgotPasswordEmail">Email</label>
+                        <input type="email" class="form-control" id="forgotPasswordEmail" required>
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--full-width">Send Reset Link</button>
+                </form>
+                
+                <div class="auth-actions">
+                    <button class="auth-link" id="backToSignInBtn">Back to sign in</button>
+                </div>
+            </div>
+            
+            <!-- Error Messages -->
+            <div class="auth-error hidden" id="authError">
+                <span id="authErrorMessage"></span>
+            </div>
+            
+            <!-- Success Messages -->
+            <div class="auth-success hidden" id="authSuccess">
+                <span id="authSuccessMessage"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="app-container hidden" id="appContainer">
         <!-- Header -->
         <header class="header">
             <div class="header-content">
-                <div class="header-left">
-                    <h1 class="app-title">StudyFlow</h1>
-                    <div class="focus-score">
-                        <span class="focus-label">Focus Score:</span>
-                        <span class="focus-value" id="focusScore">0</span>
-                    </div>
-                </div>
+                <h1 class="app-title">StudyFlow</h1>
                 <div class="mode-selector">
-                    <button class="mode-btn active" data-mode="pomodoro" title="Classic 25-minute focus blocks">Pomodoro</button>
-                    <button class="mode-btn" data-mode="deepWork" title="Extended 90-minute deep focus sessions">Deep Work</button>
-                    <button class="mode-btn" data-mode="ultradian" title="Natural 120-minute attention cycles">Ultradian</button>
-                    <button class="mode-btn" data-mode="flowState" title="Extended flow state sessions">Flow State</button>
-                    <button class="mode-btn" data-mode="custom" title="Customizable session lengths">Custom</button>
+                    <button class="mode-btn active" data-mode="pomodoro">Pomodoro</button>
+                    <button class="mode-btn" data-mode="custom">Custom</button>
+                    <button class="mode-btn" data-mode="deepWork">Deep Work</button>
                 </div>
                 <div class="header-controls">
-                    <button class="btn btn--secondary btn--sm" id="ideasToggle">💡 Ideas</button>
+                    <div class="user-menu">
+                        <button class="btn btn--secondary btn--sm" id="userMenuBtn">
+                            <span id="userDisplayName">User</span> ▼
+                        </button>
+                        <div class="user-dropdown hidden" id="userDropdown">
+                            <button class="dropdown-item" id="profileBtn">👤 Profile</button>
+                            <button class="dropdown-item" id="exportDataBtn">📥 Export Data</button>
+                            <div class="dropdown-divider"></div>
+                            <button class="dropdown-item" id="signOutBtn">🚪 Sign Out</button>
+                        </div>
+                    </div>
                     <button class="btn btn--secondary btn--sm" id="statsBtn">📊 Stats</button>
                     <button class="btn btn--secondary btn--sm" id="settingsBtn">⚙️ Settings</button>
                 </div>
@@ -58,24 +170,6 @@
                         <button class="btn btn--outline" id="stopBtn">⏹️ Stop</button>
                     </div>
                 </div>
-                
-                <!-- Sound Controls -->
-                <div class="sound-controls">
-                    <div class="sound-selector">
-                        <label class="form-label">Focus Sound</label>
-                        <select class="form-control" id="focusSound">
-                            <option value="">Silence</option>
-                            <option value="brown-noise">Brown Noise</option>
-                            <option value="forest">Forest Ambience</option>
-                            <option value="rain">Rain Sounds</option>
-                            <option value="ocean">Ocean Waves</option>
-                        </select>
-                    </div>
-                    <div class="volume-control">
-                        <label class="form-label">Volume</label>
-                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="50">
-                    </div>
-                </div>
             </div>
 
             <!-- Tasks Section -->
@@ -93,48 +187,8 @@
                 <div class="tasks-list" id="tasksList">
                     <!-- Tasks will be dynamically added here -->
                 </div>
-                
-                <!-- Achievement Banner -->
-                <div class="achievement-banner hidden" id="achievementBanner">
-                    <div class="achievement-content">
-                        <span class="achievement-icon">🏆</span>
-                        <div class="achievement-text">
-                            <div class="achievement-title" id="achievementTitle">Achievement Unlocked!</div>
-                            <div class="achievement-desc" id="achievementDesc">You've earned a new badge!</div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </main>
-
-        <!-- Ideas Panel -->
-        <div class="ideas-panel hidden" id="ideasPanel">
-            <div class="ideas-header">
-                <h3>💡 Quick Ideas</h3>
-                <button class="ideas-close" id="ideasClose">×</button>
-            </div>
-            <div class="ideas-content">
-                <div class="idea-input-container">
-                    <textarea class="form-control" id="ideaInput" placeholder="Capture your idea quickly..." rows="2"></textarea>
-                    <div class="idea-controls">
-                        <select class="form-control idea-category" id="ideaCategory">
-                            <option value="general">General</option>
-                            <option value="study">Study</option>
-                            <option value="task">Task</option>
-                            <option value="insight">Insight</option>
-                            <option value="question">Question</option>
-                        </select>
-                        <button class="btn btn--primary btn--sm" id="addIdeaBtn">Save</button>
-                    </div>
-                </div>
-                <div class="ideas-list" id="ideasList">
-                    <!-- Ideas will be dynamically added here -->
-                </div>
-                <div class="ideas-footer">
-                    <button class="btn btn--outline btn--sm" id="exportIdeasBtn">📄 Export Ideas</button>
-                </div>
-            </div>
-        </div>
 
         <!-- Footer Stats -->
         <footer class="footer-stats">
@@ -150,10 +204,6 @@
                 <span class="stat-label">Tasks Completed</span>
                 <span class="stat-value" id="todayTasks">0</span>
             </div>
-            <div class="stat-item">
-                <span class="stat-label">Ideas Captured</span>
-                <span class="stat-value" id="todayIdeas">0</span>
-            </div>
         </footer>
     </div>
 
@@ -161,7 +211,7 @@
     <div class="modal hidden" id="statsModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Statistics & Achievements</h2>
+                <h2>Statistics</h2>
                 <button class="modal-close" id="closeStatsModal">&times;</button>
             </div>
             <div class="modal-body">
@@ -183,16 +233,11 @@
                         <p class="stat-number" id="bestStreak">0 days</p>
                     </div>
                 </div>
-                
-                <div class="achievements-section">
-                    <h3>Achievements</h3>
-                    <div class="achievements-grid" id="achievementsGrid">
-                        <!-- Achievements will be rendered here -->
+                <div class="sync-status">
+                    <div class="sync-indicator">
+                        <span class="sync-dot" id="syncStatus"></span>
+                        <span id="syncStatusText">Synced</span>
                     </div>
-                </div>
-                
-                <div class="export-section">
-                    <button class="btn btn--primary" id="exportStatsBtn">📄 Export CSV</button>
                 </div>
             </div>
         </div>
@@ -217,29 +262,6 @@
                         <input type="number" class="form-control" id="customBreakTime" min="1" max="60" value="10">
                     </div>
                 </div>
-                
-                <div class="settings-group">
-                    <h3>Wellness & Focus</h3>
-                    <div class="settings-row">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="eyeReminders" checked>
-                            Eye strain reminders (20-20-20 rule)
-                        </label>
-                    </div>
-                    <div class="settings-row">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="postureReminders" checked>
-                            Posture check reminders
-                        </label>
-                    </div>
-                    <div class="settings-row">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="hydrationReminders" checked>
-                            Hydration reminders
-                        </label>
-                    </div>
-                </div>
-                
                 <div class="settings-group">
                     <h3>Preferences</h3>
                     <div class="settings-row">
@@ -256,74 +278,64 @@
                     </div>
                     <div class="settings-row">
                         <label class="checkbox-label">
-                            <input type="checkbox" id="distractionFreeMode">
-                            Distraction-free mode during focus
+                            <input type="checkbox" id="syncEnabled" checked>
+                            Sync data across devices
                         </label>
-                    </div>
-                </div>
-                
-                <div class="settings-group">
-                    <h3>Keyboard Shortcuts</h3>
-                    <div class="shortcuts-list">
-                        <div class="shortcut-item">
-                            <kbd>Space</kbd>
-                            <span>Start/Pause timer</span>
-                        </div>
-                        <div class="shortcut-item">
-                            <kbd>Esc</kbd>
-                            <span>Stop timer</span>
-                        </div>
-                        <div class="shortcut-item">
-                            <kbd>I</kbd>
-                            <span>Toggle ideas panel</span>
-                        </div>
-                        <div class="shortcut-item">
-                            <kbd>T</kbd>
-                            <span>Focus task input</span>
-                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Break Activities Modal -->
+    <!-- Profile Modal -->
+    <div class="modal hidden" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Profile</h2>
+                <button class="modal-close" id="closeProfileModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="profile-info">
+                    <div class="profile-avatar">
+                        <div class="avatar-circle" id="userAvatar">
+                            <span id="userInitials">U</span>
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <h3 id="profileDisplayName">User Name</h3>
+                        <p id="profileEmail">user@example.com</p>
+                        <p class="profile-joined">Joined <span id="profileJoinDate">today</span></p>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    <button class="btn btn--outline" id="updateProfileBtn">Update Profile</button>
+                    <button class="btn btn--outline" id="changePasswordBtn">Change Password</button>
+                    <button class="btn btn--outline btn--danger" id="deleteAccountBtn">Delete Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Break Message Modal -->
     <div class="modal hidden" id="breakModal">
         <div class="modal-content">
             <div class="modal-body text-center">
-                <h2>🎉 Great Work!</h2>
+                <h2>Great Work! 🎉</h2>
                 <p class="break-message" id="breakMessage">Time for a well-deserved break.</p>
                 <div class="break-timer">
                     <div class="break-time" id="breakTimeDisplay">5:00</div>
                     <p>Break time remaining</p>
                 </div>
-                
-                <div class="break-activities">
-                    <h3>Suggested Break Activity:</h3>
-                    <div class="break-activity" id="breakActivity">
-                        <div class="activity-title" id="activityTitle">Take a Deep Breath</div>
-                        <div class="activity-desc" id="activityDesc">Practice 4-7-8 breathing technique</div>
-                        <div class="activity-duration" id="activityDuration">60 seconds</div>
-                    </div>
-                </div>
-                
-                <div class="break-controls">
-                    <button class="btn btn--outline" id="skipBreakBtn">Skip Break</button>
-                    <button class="btn btn--primary" id="nextActivityBtn">Next Activity</button>
-                </div>
+                <button class="btn btn--primary" id="skipBreakBtn">Skip Break</button>
             </div>
         </div>
     </div>
 
-    <!-- Audio Elements -->
+    <!-- Audio element for notifications -->
     <audio id="notificationSound" preload="auto">
         <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmgyBjmBzvLZcyMFl" type="audio/wav">
     </audio>
-    
-    <audio id="focusAudio" loop>
-        <source id="focusAudioSource" src="" type="audio/mpeg">
-    </audio>
 
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
 </body>
 </html>
