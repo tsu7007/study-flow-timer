@@ -1,5 +1,26 @@
 // Enhanced StudyFlow App with All Features
 class StudyFlowApp {
+    // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyC_6s_XD_JqfQ5m6pwjXfYqnxvGOsHpjNU",
+  authDomain: "study-flow-timer.firebaseapp.com",
+  projectId: "study-flow-timer",
+  storageBucket: "study-flow-timer.firebasestorage.app",
+  messagingSenderId: "411928356145",
+  appId: "1:411928356145:web:f2ade62a1a41e95e077c10",
+  measurementId: "G-YW2361FV8T"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
     constructor() {
         // Configuration from application data
         this.spotifyConfig = {
