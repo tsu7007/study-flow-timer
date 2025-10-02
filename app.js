@@ -31,13 +31,15 @@ import {
 // 4. Enable Firestore Database
 // 5. Replace the config below with your project's config
 const firebaseConfig = {
-    apiKey: "your-api-key-here",
-    authDomain: "your-project.firebaseapp.com",
-    projectId: "your-project-id",
-    storageBucket: "your-project.appspot.com",
-    messagingSenderId: "123456789012",
-    appId: "your-app-id"
+  apiKey: "AIzaSyC_6s_XD_JqfQ5m6pwjXfYqnxvGOsHpjNU",
+  authDomain: "study-flow-timer.firebaseapp.com",
+  projectId: "study-flow-timer",
+  storageBucket: "study-flow-timer.firebasestorage.app",
+  messagingSenderId: "411928356145",
+  appId: "1:411928356145:web:f2ade62a1a41e95e077c10",
+  measurementId: "G-YW2361FV8T"
 };
+
 
 // Check if Firebase config is properly set up
 const isFirebaseConfigured = firebaseConfig.apiKey !== "your-api-key-here";
